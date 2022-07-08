@@ -129,35 +129,76 @@ int main(int argc, char **argv)
         sscanf(buf, "%s %s %s\n", method, uri, version);
         
         if (strcasecmp(method, "GET")) {
-	    fprintf(stream, "HTTP/1.1 400 Bad Request\n");
-	    fprintf(stream, "\r\n");
+            fprintf(stream, "HTTP/1.1 400 Bad Request\n");
+            fprintf(stream, "\r\n");
             fclose(stream);
             close(childfd);
             continue;
         }
 
-	printf("URI = %s\n\n", uri);
-	char message[BUFSIZE];
-	urldecode(message, uri);
-	printf("Message = %s\n\n", message);
-	
         /* read the HTTP headers */
-        fgets(buf, BUFSIZE, stream);
-        printf("%s", buf);
-        while(strcmp(buf, "\r\n")) {
-            fgets(buf, BUFSIZE, stream);
+        fread(buf, 1, BUFSIZE, stream);
+        char *char_ptr = strstr(buf, "Nexmo/MessagingHUB/v1.0");
+        int index;
+        if (char_ptr != NULL)
+        {
+            printf("Is SMS!\n");
             printf("%s", buf);
-        }
-        
-	/* print response in case of success */
-	// fprintf(stream, "HTTP/1.1 200 OK\n");
-	fprintf(stream, "HTTP/1.1 204 No Content\n");
-	// fprintf(stream, "Server: HERMES SMS\n");
-	fprintf(stream, "\r\n");
-	fflush(stream);
+            printf("URI = %s\n\n", uri);
 
-	fclose(stream);
-	close(childfd);
+            // get msisdn (aka: from)
+            char_ptr =  strstr(buf, "?msisdn=") + + strlen("?msisdn=");
+            char from[BUFSIZE];
+            index = 0;
+            while (char_ptr[index] != '&')
+                from[index] = char_ptr[index];
+            from[++index] = 0;
+
+            printf("MSISDN (FROM) = %s", from);
+
+            // get to
+            char_ptr =  strstr(buf, "&to=") + + strlen("&to=");
+            char to[BUFSIZE];
+            index = 0;
+            while (char_ptr[index] != '&')
+                to[index] = char_ptr[index];
+            to[++index] = 0;
+
+            printf("To = %s", to);
+
+            // get messageId
+            char_ptr =  strstr(buf, "&messageId=") + strlen("&messageId=");
+            char messageId[BUFSIZE];
+            index = 0;
+            while (char_ptr[index] != '&')
+                messageId[index] = char_ptr[index];
+            messageId[++index] = 0;
+
+            printf("messageId = %s", messageId);
+
+            // get message
+            char_ptr =  strstr(buf, "&text=") + strlen("&text=");
+            char message[BUFSIZE];
+            index = 0;
+            while (char_ptr[index] != '&')
+                message[index] = char_ptr[index];
+            message[++index] = 0;
+            printf("message raw = %s", message);
+
+            char message_dec[BUFSIZE];
+            urldecode(message_dec, message);
+            printf("Message Decoded = %s\n\n", message_dec);
+        }
+
+        /* print response in case of success */
+        // fprintf(stream, "HTTP/1.1 200 OK\n");
+        fprintf(stream, "HTTP/1.1 204 No Content\n");
+        // fprintf(stream, "Server: HERMES SMS\n");
+        fprintf(stream, "\r\n");
+        fflush(stream);
+
+        fclose(stream);
+        close(childfd);
     }
         
     /* clean up */
