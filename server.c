@@ -166,19 +166,18 @@ int main(int argc, char **argv)
             index = -1;
             while (char_ptr[++index] != '&')
                 from[index] = char_ptr[index];
-            from[++index] = 0;
+            from[++index] ='\n'; from[index + 1] = 0;
 
             printf("MSISDN (FROM) = %s\n", from);
 
             // get to
             char_ptr =  strstr(uri, "&to=") + strlen("&to=");
-            char to[BUFSIZE];
+            char dest[BUFSIZE];
             index = -1;
             while (char_ptr[++index] != '&')
-                to[index] = char_ptr[index];
-            to[++index] = 0;
-
-            printf("To = %s\n", to);
+                dest[index] = char_ptr[index];
+            dest[++index] ='\n'; dest[index + 1] = 0;
+            printf("To = %s\n", dest);
 
             // get messageId
             char_ptr =  strstr(uri, "&messageId=") + strlen("&messageId=");
@@ -186,7 +185,7 @@ int main(int argc, char **argv)
             index = -1;
             while (char_ptr[++index] != '&')
                 messageId[index] = char_ptr[index];
-            messageId[++index] = 0;
+            messageId[++index] ='\n'; messageId[index + 1] = 0;
 
             printf("messageId = %s\n", messageId);
 
@@ -196,12 +195,13 @@ int main(int argc, char **argv)
             index = -1;
             while (char_ptr[++index] != '&')
                 message[index] = char_ptr[index];
-            message[++index] = 0;
+            message[++index] ='\n'; message[index + 1] = 0;
             printf("message raw = %s\n", message);
 
+            // decode message
             char message_dec[BUFSIZE];
             urldecode(message_dec, message);
-            printf("Message Decoded = %s\n\n", message_dec);
+            printf("Message Decoded = %s\n", message_dec);
         }
 
         /* print response in case of success */
