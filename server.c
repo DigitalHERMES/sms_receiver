@@ -166,7 +166,7 @@ int main(int argc, char **argv)
             index = -1;
             while (char_ptr[++index] != '&')
                 from[index] = char_ptr[index];
-            from[++index] ='\n'; from[index + 1] = 0;
+            from[index] ='\n'; from[index + 1] = 0;
 
             printf("MSISDN (FROM) = %s\n", from);
 
@@ -176,7 +176,7 @@ int main(int argc, char **argv)
             index = -1;
             while (char_ptr[++index] != '&')
                 dest[index] = char_ptr[index];
-            dest[++index] ='\n'; dest[index + 1] = 0;
+            dest[index] ='\n'; dest[index + 1] = 0;
             printf("To = %s\n", dest);
 
             // get messageId
@@ -185,7 +185,7 @@ int main(int argc, char **argv)
             index = -1;
             while (char_ptr[++index] != '&')
                 messageId[index] = char_ptr[index];
-            messageId[++index] ='\n'; messageId[index + 1] = 0;
+            messageId[index] ='\n'; messageId[index + 1] = 0;
 
             printf("messageId = %s\n", messageId);
 
@@ -195,7 +195,7 @@ int main(int argc, char **argv)
             index = -1;
             while (char_ptr[++index] != '&')
                 message[index] = char_ptr[index];
-            message[++index] ='\n'; message[index + 1] = 0;
+            message[index] ='\n'; message[index + 1] = 0;
             printf("message raw = %s\n", message);
 
             // decode message
@@ -220,3 +220,31 @@ int main(int argc, char **argv)
     close(childfd);
     close(parentfd);
 }
+
+#if 0
+URI = /?msisdn=5511998728111&to=5511953259200&messageId=28000000054225B9&concat=true&concat-ref=222&concat-total=3&concat-part=1&text=Siiiiiiim+senhor+meu+patr%C3%A3o+de+longa+data+vamos+fazer+uma+mensagem+&type=unicode&keyword=SIIIIIIIM&api-key=cd906872&message-timestamp=2022-07-08+20%3A38%3A36
+
+MSISDN (FROM) = 5511998728111To = 5511953259200messageId = 28000000054225B9message raw = Siiiiiiim+senhor+meu+patr%C3%A3o+de+longa+data+vamos+fazer+uma+mensagem+Message Decoded = Siiiiiiim senhor meu patrão de longa data vamos fazer uma mensagem
+
+GET /?msisdn=5511998728111&to=5511953259200&messageId=28000000054225DB&concat=true&concat-ref=222&concat-total=3&concat-part=2&text=at%C3%A9+que+vem+longuinha+mesmo+ser%C3%A1+que+vain123445677889+aasssss+looon&type=unicode&keyword=AT%C3%89&api-key=cd906872&message-timestamp=2022-07-08+20%3A38%3A40 HTTP/1.1
+Accept: */*
+User-Agent: Nexmo/MessagingHUB/v1.0
+Host: hermes.radio:12345
+
+Is SMS!
+URI = /?msisdn=5511998728111&to=5511953259200&messageId=28000000054225DB&concat=true&concat-ref=222&concat-total=3&concat-part=2&text=at%C3%A9+que+vem+longuinha+mesmo+ser%C3%A1+que+vain123445677889+aasssss+looon&type=unicode&keyword=AT%C3%89&api-key=cd906872&message-timestamp=2022-07-08+20%3A38%3A40
+
+MSISDN (FROM) = 5511998728111To = 5511953259200messageId = 28000000054225DBmessage raw = at%C3%A9+que+vem+longuinha+mesmo+ser%C3%A1+que+vain123445677889+aasssss+looonMessage Decoded = até que vem longuinha mesmo será que vain123445677889 aasssss looon
+
+GET /?msisdn=5511998728111&to=5511953259200&messageId=26000000012C9274&concat=true&concat-ref=222&concat-total=3&concat-part=3&text=ga%C3%A9+ajdjduejdjdjeuudjdjjdjdjdjjj+23456777553224565324664335534&type=unicode&keyword=GA%C3%89&api-key=cd906872&message-timestamp=2022-07-08+20%3A38%3A43 HTTP/1.1
+Accept: */*
+User-Agent: Nexmo/MessagingHUB/v1.0
+Host: hermes.radio:12345
+
+Is SMS!
+URI = /?msisdn=5511998728111&to=5511953259200&messageId=26000000012C9274&concat=true&concat-ref=222&concat-total=3&concat-part=3&text=ga%C3%A9+ajdjduejdjdjeuudjdjjdjdjdjjj+23456777553224565324664335534&type=unicode&keyword=GA%C3%89&api-key=cd906872&message-timestamp=2022-07-08+20%3A38%3A43
+
+MSISDN (FROM) = 5511998728111To = 5511953259200messageId = 26000000012C9274message raw = ga%C3%A9+ajdjduejdjdjeuudjdjjdjdjdjjj+23456777553224565324664335534sMessage Decoded = gaé ajdjduejdjdjeuudjdjjdjdjdjjj 23456777553224565324664335534s
+
+
+#endif
