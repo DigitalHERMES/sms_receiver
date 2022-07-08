@@ -168,7 +168,7 @@ int main(int argc, char **argv)
                 from[index] = char_ptr[index];
             from[++index] = 0;
 
-            printf("MSISDN (FROM) = %s", from);
+            printf("MSISDN (FROM) = %s\n", from);
 
             // get to
             char_ptr =  strstr(uri, "&to=") + strlen("&to=");
@@ -178,7 +178,7 @@ int main(int argc, char **argv)
                 to[index] = char_ptr[index];
             to[++index] = 0;
 
-            printf("To = %s", to);
+            printf("To = %s\n", to);
 
             // get messageId
             char_ptr =  strstr(uri, "&messageId=") + strlen("&messageId=");
@@ -188,7 +188,7 @@ int main(int argc, char **argv)
                 messageId[index] = char_ptr[index];
             messageId[++index] = 0;
 
-            printf("messageId = %s", messageId);
+            printf("messageId = %s\n", messageId);
 
             // get message
             char_ptr =  strstr(uri, "&text=") + strlen("&text=");
@@ -197,7 +197,7 @@ int main(int argc, char **argv)
             while (char_ptr[++index] != '&')
                 message[index] = char_ptr[index];
             message[++index] = 0;
-            printf("message raw = %s", message);
+            printf("message raw = %s\n", message);
 
             char message_dec[BUFSIZE];
             urldecode(message_dec, message);
