@@ -158,11 +158,10 @@ int main(int argc, char **argv)
         int index;
         if (is_sms){
             printf("Is SMS!\n");
-            printf("%s", uri);
             printf("URI = %s\n\n", uri);
 
             // get msisdn (aka: from)
-            char_ptr =  strstr(uri, "?msisdn=") + strlen("?msisdn=");
+            char_ptr =  strstr(uri, "msisdn=") + strlen("msisdn=");
             char from[BUFSIZE];
             index = 0;
             while (char_ptr[index] != '&')
