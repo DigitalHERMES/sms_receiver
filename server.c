@@ -16,6 +16,7 @@
 #include <sys/stat.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <stdbool.h>
 
 #define BUFSIZE 4096
 
@@ -73,6 +74,9 @@ int main(int argc, char **argv)
     char method[BUFSIZE];
     char uri[BUFSIZE];
     char version[BUFSIZE];
+
+    bool is_sms = false;
+    char *char_ptr = NULL;
 
     if (argc != 2) {
         fprintf(stderr, "usage: %s <port>\n", argv[0]);
@@ -136,12 +140,23 @@ int main(int argc, char **argv)
             continue;
         }
 
+        is_sms = false;
         /* read the HTTP headers */
-        fread(buf, 1, BUFSIZE, stream);
-        char *char_ptr = strstr(buf, "Nexmo/MessagingHUB/v1.0");
-        int index;
+        fgets(buf, BUFSIZE, stream);
+        char_ptr = strstr(buf, "Nexmo/MessagingHUB/v1.0");
         if (char_ptr != NULL)
-        {
+            is_sms = true;
+        printf("%s", buf);
+        while(strcmp(buf, "\r\n")) {
+            fgets(buf, BUFSIZE, stream);
+            char_ptr = strstr(buf, "Nexmo/MessagingHUB/v1.0");
+            if (char_ptr != NULL)
+                is_sms = true;
+            printf("%s", buf);
+        }
+
+        int index;
+        if (is_sms){
             printf("Is SMS!\n");
             printf("%s", buf);
             printf("URI = %s\n\n", uri);
