@@ -161,9 +161,9 @@ int main(int argc, char **argv)
             printf("URI = %s\n\n", uri);
 
             // get msisdn (aka: from)
-            char_ptr =  strstr(uri, "msisdn=") + strlen("msisdn=");
+            char_ptr =  strstr(uri, "?msisdn=") + strlen("?msisdn=");
             char from[BUFSIZE];
-            index = 0;
+            index = -1;
             while (char_ptr[++index] != '&')
                 from[index] = char_ptr[index];
             from[++index] = 0;
@@ -173,7 +173,7 @@ int main(int argc, char **argv)
             // get to
             char_ptr =  strstr(uri, "&to=") + strlen("&to=");
             char to[BUFSIZE];
-            index = 0;
+            index = -1;
             while (char_ptr[++index] != '&')
                 to[index] = char_ptr[index];
             to[++index] = 0;
@@ -183,7 +183,7 @@ int main(int argc, char **argv)
             // get messageId
             char_ptr =  strstr(uri, "&messageId=") + strlen("&messageId=");
             char messageId[BUFSIZE];
-            index = 0;
+            index = -1;
             while (char_ptr[++index] != '&')
                 messageId[index] = char_ptr[index];
             messageId[++index] = 0;
@@ -193,7 +193,7 @@ int main(int argc, char **argv)
             // get message
             char_ptr =  strstr(uri, "&text=") + strlen("&text=");
             char message[BUFSIZE];
-            index = 0;
+            index = -1;
             while (char_ptr[++index] != '&')
                 message[index] = char_ptr[index];
             message[++index] = 0;
