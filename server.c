@@ -158,11 +158,11 @@ int main(int argc, char **argv)
         int index;
         if (is_sms){
             printf("Is SMS!\n");
-            printf("%s", buf);
+            printf("%s", uri);
             printf("URI = %s\n\n", uri);
 
             // get msisdn (aka: from)
-            char_ptr =  strstr(buf, "?msisdn=") + + strlen("?msisdn=");
+            char_ptr =  strstr(uri, "?msisdn=") + + strlen("?msisdn=");
             char from[BUFSIZE];
             index = 0;
             while (char_ptr[index] != '&')
@@ -172,7 +172,7 @@ int main(int argc, char **argv)
             printf("MSISDN (FROM) = %s", from);
 
             // get to
-            char_ptr =  strstr(buf, "&to=") + + strlen("&to=");
+            char_ptr =  strstr(uri, "&to=") + + strlen("&to=");
             char to[BUFSIZE];
             index = 0;
             while (char_ptr[index] != '&')
@@ -182,7 +182,7 @@ int main(int argc, char **argv)
             printf("To = %s", to);
 
             // get messageId
-            char_ptr =  strstr(buf, "&messageId=") + strlen("&messageId=");
+            char_ptr =  strstr(uri, "&messageId=") + strlen("&messageId=");
             char messageId[BUFSIZE];
             index = 0;
             while (char_ptr[index] != '&')
@@ -192,7 +192,7 @@ int main(int argc, char **argv)
             printf("messageId = %s", messageId);
 
             // get message
-            char_ptr =  strstr(buf, "&text=") + strlen("&text=");
+            char_ptr =  strstr(uri, "&text=") + strlen("&text=");
             char message[BUFSIZE];
             index = 0;
             while (char_ptr[index] != '&')
