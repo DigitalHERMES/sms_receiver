@@ -162,11 +162,6 @@ int main(int argc, char **argv)
                 if(!strcmp(buf, "\r\n"))
                     printf("got it!n\n");
 
-                /* read the HTTP headers */
-                int bytes_read = SSL_read(ssl, buf, BUFSIZE);
-                if (bytes_read > 0)
-                    printf("More bytes to read: %d\n",bytes_read);
-
                 char *reply = "HTTP/1.1 204 No Content\n\r\n";
                 SSL_write(ssl, reply, strlen(reply));
 
