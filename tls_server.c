@@ -1,11 +1,24 @@
 /*
-
-  Rhizomatica SMS receiver sample
-
+ * Copyright (C) 2022 Rhizomatica <rafael@rhizomatica.org>
+ *
+ * This is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3, or (at your option)
+ * any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this software; see the file COPYING.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street,
+ * Boston, MA 02110-1301, USA.
+ *
+ * SMS processor for Nexmo / Vonage
+ *
  */
-
-
-// Based on: https://wiki.openssl.org/index.php/Simple_TLS_Server
 
 #include <stdio.h>
 #include <unistd.h>
@@ -17,7 +30,7 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
-#define BUFSIZE 4096
+#include "process_sms.h"
 
 int sock;
 SSL_CTX *ctx;
@@ -107,7 +120,6 @@ int main(int argc, char **argv)
     char uri[BUFSIZE];
     char version[BUFSIZE];
 
-    bool is_sms = false;
     char *char_ptr = NULL;
 
     signal(SIGINT, intHandler);
@@ -147,25 +159,21 @@ int main(int argc, char **argv)
             printf("%s\n", buf);
             printf("bytes read: %d\n",bytes_read);
             sscanf(buf, "%s %s %s\n", method, uri, version);
-
             printf("method: %s, uri: %s, version: %s\n",method, uri, version);
 
             if (strcasecmp(method, "GET")) {
                 char *reply = "HTTP/1.1 400 Bad Request\n\r\n";
                 SSL_write(ssl, reply, strlen(reply));
-                printf("HERE!\n");
             }
             else
             {
-                is_sms = false;
 
-                if(!strcmp(buf, "\r\n"))
-                    printf("got it!n\n");
+                char_ptr = strstr(buf, "Nexmo/MessagingHUB/v1.0");
+                if (char_ptr != NULL)
+                    process_sms(uri);
 
                 char *reply = "HTTP/1.1 204 No Content\n\r\n";
                 SSL_write(ssl, reply, strlen(reply));
-
-                printf("There!\n");
             }
 
         }

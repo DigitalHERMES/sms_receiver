@@ -18,38 +18,7 @@
 #include <arpa/inet.h>
 #include <stdbool.h>
 
-#define BUFSIZE 4096
-
-void urldecode(char *dst, char *src)
-{
-        char a, b;
-        while (*src) {
-                if ((*src == '%') &&
-                    ((a = src[1]) && (b = src[2])) &&
-                    (isxdigit(a) && isxdigit(b))) {
-                        if (a >= 'a')
-                                a -= 'a'-'A';
-                        if (a >= 'A')
-                                a -= ('A' - 10);
-                        else
-                                a -= '0';
-                        if (b >= 'a')
-                                b -= 'a'-'A';
-                        if (b >= 'A')
-                                b -= ('A' - 10);
-                        else
-                                b -= '0';
-                        *dst++ = 16*a+b;
-                        src+=3;
-                } else if (*src == '+') {
-                        *dst++ = ' ';
-                        src++;
-                } else {
-                        *dst++ = *src++;
-                }
-        }
-        *dst++ = '\0';
-}
+#include "process_sms.h"
 
 
 void error(char *msg)
@@ -151,54 +120,9 @@ int main(int argc, char **argv)
             printf("%s", buf);
         } while(strcmp(buf, "\r\n"));
 
-        int index;
-        if (is_sms){
-            printf("Is SMS!\n");
-            printf("URI = %s\n\n", uri);
-
-            // get msisdn (aka: from)
-            char_ptr =  strstr(uri, "?msisdn=") + strlen("?msisdn=");
-            char from[BUFSIZE];
-            for(index = 0; char_ptr[index] != '&'; index++)
-                from[index] = char_ptr[index];
-            from[index] ='\n'; from[index + 1] = 0;
-
-            printf("MSISDN (FROM) = %s\n", from);
-
-            // get to
-            char_ptr =  strstr(uri, "&to=") + strlen("&to=");
-            char dest[BUFSIZE];
-            for(index = 0; char_ptr[index] != '&'; index++)
-                dest[index] = char_ptr[index];
-            dest[index] ='\n'; dest[index + 1] = 0;
-            printf("To = %s\n", dest);
-
-            // get messageId
-            char_ptr =  strstr(uri, "&messageId=") + strlen("&messageId=");
-            char messageId[BUFSIZE];
-            for(index = 0; char_ptr[index] != '&'; index++)
-                messageId[index] = char_ptr[index];
-            messageId[index] ='\n'; messageId[index + 1] = 0;
-
-            printf("messageId = %s\n", messageId);
-
-            // get message
-            char_ptr =  strstr(uri, "&text=") + strlen("&text=");
-            char message[BUFSIZE];
-            for(index = 0; char_ptr[index] != '&'; index++)
-                message[index] = char_ptr[index];
-            message[index] ='\n'; message[index + 1] = 0;
-            printf("message raw = %s\n", message);
-
-            // decode message
-            char message_dec[BUFSIZE];
-            urldecode(message_dec, message);
-            printf("Message Decoded = %s\n", message_dec);
-
-            // remember to apply urldecode to time stamp
-            // check if we need put apply it also to other fields
-            // send mail
-            // record a log que the timestamp
+        if (is_sms)
+        {
+            process_sms(uri);
         }
 
         /* print response in case of success */
