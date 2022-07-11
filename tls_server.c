@@ -73,7 +73,7 @@ int create_socket(int port)
         exit(EXIT_FAILURE);
     }
 
-    if (listen(s, 1) < 0)
+    if (listen(s, 5) < 0)
     {
         perror("Unable to listen");
         exit(EXIT_FAILURE);

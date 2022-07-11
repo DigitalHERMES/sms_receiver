@@ -141,7 +141,3 @@ int main(int argc, char **argv)
     close(childfd);
     close(parentfd);
 }
-
-#if 0
-
-#endif
