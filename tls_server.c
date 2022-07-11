@@ -117,6 +117,7 @@ int main(int argc, char **argv)
 
     sock = create_socket(12345);
 
+    keepRunning = true;
 
     /* Handle connections */
     while(keepRunning)
