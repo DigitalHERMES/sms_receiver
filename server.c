@@ -142,18 +142,14 @@ int main(int argc, char **argv)
 
         is_sms = false;
         /* read the HTTP headers */
-        fgets(buf, BUFSIZE, stream);
-        char_ptr = strstr(buf, "Nexmo/MessagingHUB/v1.0");
-        if (char_ptr != NULL)
-            is_sms = true;
-        printf("%s", buf);
-        while(strcmp(buf, "\r\n")) {
+        do
+        {
             fgets(buf, BUFSIZE, stream);
             char_ptr = strstr(buf, "Nexmo/MessagingHUB/v1.0");
             if (char_ptr != NULL)
                 is_sms = true;
             printf("%s", buf);
-        }
+        } while(strcmp(buf, "\r\n"));
 
         int index;
         if (is_sms){

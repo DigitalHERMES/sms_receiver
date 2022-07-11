@@ -1,12 +1,22 @@
-// from: https://wiki.openssl.org/index.php/Simple_TLS_Server
+/*
+
+  Rhizomatica SMS receiver sample
+
+ */
+
+
+// Based on: https://wiki.openssl.org/index.php/Simple_TLS_Server
 
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdbool.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+
+#define BUFSIZE 4096
 
 int create_socket(int port)
 {
@@ -72,18 +82,29 @@ int main(int argc, char **argv)
     int sock;
     SSL_CTX *ctx;
 
+    char buf[BUFSIZE];
+    char method[BUFSIZE];
+    char uri[BUFSIZE];
+    char version[BUFSIZE];
+
+    bool is_sms = false;
+    char *char_ptr = NULL;
+
+
     ctx = create_context();
 
     configure_context(ctx);
 
     sock = create_socket(12345);
 
+
+
     /* Handle connections */
-    while(1) {
+    while(1)
+    {
         struct sockaddr_in addr;
         unsigned int len = sizeof(addr);
         SSL *ssl;
-        const char reply[] = "test\n";
 
         int client = accept(sock, (struct sockaddr*)&addr, &len);
         if (client < 0) {
@@ -94,10 +115,36 @@ int main(int argc, char **argv)
         ssl = SSL_new(ctx);
         SSL_set_fd(ssl, client);
 
-        if (SSL_accept(ssl) <= 0) {
+        if (SSL_accept(ssl) <= 0)
+        {
             ERR_print_errors_fp(stderr);
-        } else {
-            SSL_write(ssl, reply, strlen(reply));
+        } else
+        {
+            /* get the HTTP request line */
+            int bytes_read = SSL_read(ssl, buf, BUFSIZE);
+            printf("%s\n", buf);
+            printf("bytes read: %d\n",bytes_read);
+            sscanf(buf, "%s %s %s\n", method, uri, version);
+
+            if (strcasecmp(method, "GET")) {
+                char *reply = "HTTP/1.1 400 Bad Request\n\r\n";
+                SSL_write(ssl, reply, strlen(reply));
+            }
+            else
+            {
+                is_sms = false;
+                /* read the HTTP headers */
+                int bytes_read = SSL_read(ssl, buf, BUFSIZE);
+                if (bytes_read > 0)
+                    printf("More bytes to read: %d\n",bytes_read);
+
+                if(!strcmp(buf, "\r\n"))
+                    printf("got it!n\n");
+
+                char *reply = "HTTP/1.1 400 Bad Request\n\r\n";
+                SSL_write(ssl, reply, strlen(reply));
+            }
+
         }
 
         SSL_shutdown(ssl);
