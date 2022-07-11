@@ -11,12 +11,32 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdbool.h>
+#include <signal.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
 #define BUFSIZE 4096
+
+int sock;
+SSL_CTX *ctx;
+
+static volatile bool keepRunning = false;
+
+// Ctrl+C graceful exit
+
+void intHandler(int dummy)
+{
+    if (keepRunning)
+    {
+        keepRunning = false;
+        close(sock);
+        SSL_CTX_free(ctx);
+    }
+
+    exit(EXIT_SUCCESS);
+}
 
 int create_socket(int port)
 {
@@ -28,17 +48,20 @@ int create_socket(int port)
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
     s = socket(AF_INET, SOCK_STREAM, 0);
-    if (s < 0) {
+    if (s < 0)
+    {
         perror("Unable to create socket");
         exit(EXIT_FAILURE);
     }
 
-    if (bind(s, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+    if (bind(s, (struct sockaddr*)&addr, sizeof(addr)) < 0)
+    {
         perror("Unable to bind");
         exit(EXIT_FAILURE);
     }
 
-    if (listen(s, 1) < 0) {
+    if (listen(s, 1) < 0)
+    {
         perror("Unable to listen");
         exit(EXIT_FAILURE);
     }
@@ -79,9 +102,6 @@ void configure_context(SSL_CTX *ctx)
 
 int main(int argc, char **argv)
 {
-    int sock;
-    SSL_CTX *ctx;
-
     char buf[BUFSIZE];
     char method[BUFSIZE];
     char uri[BUFSIZE];
@@ -90,17 +110,16 @@ int main(int argc, char **argv)
     bool is_sms = false;
     char *char_ptr = NULL;
 
+    signal(SIGINT, intHandler);
 
     ctx = create_context();
-
     configure_context(ctx);
 
     sock = create_socket(12345);
 
 
-
     /* Handle connections */
-    while(1)
+    while(keepRunning)
     {
         struct sockaddr_in addr;
         unsigned int len = sizeof(addr);
@@ -122,6 +141,8 @@ int main(int argc, char **argv)
         {
             /* get the HTTP request line */
             int bytes_read = SSL_read(ssl, buf, BUFSIZE);
+            if (bytes_read <= 0)
+                goto bail;
             printf("%s\n", buf);
             printf("bytes read: %d\n",bytes_read);
             sscanf(buf, "%s %s %s\n", method, uri, version);
@@ -131,6 +152,7 @@ int main(int argc, char **argv)
             if (strcasecmp(method, "GET")) {
                 char *reply = "HTTP/1.1 400 Bad Request\n\r\n";
                 SSL_write(ssl, reply, strlen(reply));
+                printf("HERE!\n");
             }
             else
             {
@@ -146,10 +168,13 @@ int main(int argc, char **argv)
 
                 char *reply = "HTTP/1.1 204 No Content\n\r\n";
                 SSL_write(ssl, reply, strlen(reply));
+
+                printf("There!\n");
             }
 
         }
 
+    bail:
         SSL_shutdown(ssl);
         SSL_free(ssl);
         close(client);
