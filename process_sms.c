@@ -197,6 +197,15 @@ bool process_sms(char *uri)
 
         printf("concat-ref=%d\nconcat-total=%d\nconcat-part=%d\n", concat_ref_now, concat_total, concat_part);
 
+        if (!concat_part || !concat_total)
+        {
+            printf("Error dealing with concatenated messages!\n");
+            return false;
+        }
+
+        if (concat_part == 1)
+            concat_ref = concat_ref_now;
+
         if (concat_part > 1 && concat_ref != concat_ref_now)
         {
             printf("Error dealing with concatenated messages!\n");
@@ -215,10 +224,7 @@ bool process_sms(char *uri)
 
     }
 
-    // remember to apply urldecode to time stamp
-    // check if we need put apply it also to other fields
     // send mail
-    // record a log que the timestamp
 
     return true;
 }
