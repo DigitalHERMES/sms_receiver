@@ -126,6 +126,8 @@ int main(int argc, char **argv)
             printf("bytes read: %d\n",bytes_read);
             sscanf(buf, "%s %s %s\n", method, uri, version);
 
+            printf("method: %s, uri: %s, version: %s\n",method, uri, version);
+
             if (strcasecmp(method, "GET")) {
                 char *reply = "HTTP/1.1 400 Bad Request\n\r\n";
                 SSL_write(ssl, reply, strlen(reply));
@@ -133,15 +135,16 @@ int main(int argc, char **argv)
             else
             {
                 is_sms = false;
+
+                if(!strcmp(buf, "\r\n"))
+                    printf("got it!n\n");
+
                 /* read the HTTP headers */
                 int bytes_read = SSL_read(ssl, buf, BUFSIZE);
                 if (bytes_read > 0)
                     printf("More bytes to read: %d\n",bytes_read);
 
-                if(!strcmp(buf, "\r\n"))
-                    printf("got it!n\n");
-
-                char *reply = "HTTP/1.1 400 Bad Request\n\r\n";
+                char *reply = "HTTP/1.1 204 No Content\n\r\n";
                 SSL_write(ssl, reply, strlen(reply));
             }
 
