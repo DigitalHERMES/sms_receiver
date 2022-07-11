@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 
     configure_context(ctx);
 
-    sock = create_socket(4433);
+    sock = create_socket(12345);
 
     /* Handle connections */
     while(1) {

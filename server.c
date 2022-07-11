@@ -198,6 +198,11 @@ int main(int argc, char **argv)
             char message_dec[BUFSIZE];
             urldecode(message_dec, message);
             printf("Message Decoded = %s\n", message_dec);
+
+            // remember to apply urldecode to time stamp
+            // check if we need put apply it also to other fields
+            // send mail
+            // record a log que the timestamp
         }
 
         /* print response in case of success */
