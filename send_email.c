@@ -61,7 +61,9 @@ bool send_email(char *from, char *dest, char *timestamp, int argc, char **argv, 
 
     email_body = popen(mail_cmd, "w");
 
-    fprintf(email_body, "Mensagem enviada em %s, de %s\n", timestamp, from);
+    fprintf(email_body, "Mensagem enviada em %s, de %s:\n", timestamp, from);
+
+    fprintf(email_body, "%s:\n", body);
 
     pclose(email_body);
 

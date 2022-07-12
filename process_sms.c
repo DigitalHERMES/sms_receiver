@@ -256,7 +256,7 @@ bool process_sms(char *uri, int argc, char **argv)
     if (concat_message_flag && !concat_message_ready)
         return true;
 
-    send_email(from, dest, timestamp, argc, argv, concat_message_flag? concat_message : message_dec);
+    send_email(from, dest, timestamp_dec, argc, argv, concat_message_flag? concat_message : message_dec);
 
     return true;
 }
