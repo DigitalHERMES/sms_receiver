@@ -45,7 +45,7 @@ bool send_email(char *from, char *dest, char *timestamp, int argc, char **argv, 
 
     strcat (mail_cmd, "(mail -r ");
     strcat (mail_cmd, FROM);
-    strcat (mail_cmd, "-s \"");
+    strcat (mail_cmd, " -s \"");
     strcat (mail_cmd, SUBJECT);
     strcat (mail_cmd, "\" ");
 
