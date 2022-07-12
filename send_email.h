@@ -20,15 +20,13 @@
  *
  */
 
-#ifndef PROCESS_SMS_H_
-#define PROCESS_SMS_H_
+#ifndef SEND_EMAIL_H_
+#define SEND_EMAIL_H_
 
 #include<stdbool.h>
 
-#define BUFSIZE 4096
+bool send_email(char *from, char *dest, char *timestamp, int argc, char **argv, char *body);
 
 
-bool process_sms(char *uri, int argc, char **argv);
 
-
-#endif // PROCESS_SMS_H_
+#endif // SEND_EMAIL_H_

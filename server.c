@@ -47,9 +47,9 @@ int main(int argc, char **argv)
     bool is_sms = false;
     char *char_ptr = NULL;
 
-    if (argc != 2) {
-        fprintf(stderr, "usage: %s <port>\n", argv[0]);
-        exit(1);
+    if (argc < 2) {
+        fprintf(stderr, "usage: %s <port> [<email1> <email2> ...]\n", argv[0]);
+        exit(EXIT_FAILURE);
     }
     portno = atoi(argv[1]);
     
@@ -122,7 +122,7 @@ int main(int argc, char **argv)
 
         if (is_sms)
         {
-            process_sms(uri);
+            process_sms(uri, argc, argv);
         }
 
         /* print response in case of success */

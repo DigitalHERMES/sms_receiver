@@ -44,8 +44,10 @@ void intHandler(int dummy)
     if (keepRunning)
     {
         keepRunning = false;
+        usleep(100000);
         close(sock);
         SSL_CTX_free(ctx);
+        usleep(100000);
     }
 
     exit(EXIT_SUCCESS);
@@ -123,11 +125,20 @@ int main(int argc, char **argv)
     char *char_ptr = NULL;
 
     signal(SIGINT, intHandler);
+    signal (SIGTERM, intHandler);
+
+    int portno;
+    if (argc < 2) {
+        fprintf(stderr, "usage: %s <port> [<email1> <email2> ...]\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+    portno = atoi(argv[1]);
+
 
     ctx = create_context();
     configure_context(ctx);
 
-    sock = create_socket(12345);
+    sock = create_socket(portno);
 
     keepRunning = true;
 
@@ -170,14 +181,24 @@ int main(int argc, char **argv)
 
                 char_ptr = strstr(buf, "Nexmo/MessagingHUB/v1.0");
                 if (char_ptr != NULL)
-                    process_sms(uri);
+                {
+                    if (process_sms(uri, argc, argv))
+                    {
+                        printf("SMS Correctly Processed.");
+                        char *reply = "HTTP/1.1 204 No Content\n\r\n";
+                        SSL_write(ssl, reply, strlen(reply));
+                    }
+                    else
+                    {
+                        printf("Failure to process SMS.");
+                        char *reply = "HTTP/1.1 400 Bad Request\n\r\n";
+                        SSL_write(ssl, reply, strlen(reply));
 
-                char *reply = "HTTP/1.1 204 No Content\n\r\n";
-                SSL_write(ssl, reply, strlen(reply));
+                    }
+                }
+
             }
-
         }
-
     bail:
         SSL_shutdown(ssl);
         SSL_free(ssl);

@@ -26,11 +26,10 @@
 #include <stdlib.h>
 
 #include "process_sms.h"
+#include "send_email.h"
 
 void urldecode(char *dst, char *src)
 {
-
-
     char a, b;
     while (*src) {
         if ((*src == '%') &&
@@ -61,7 +60,7 @@ void urldecode(char *dst, char *src)
 }
 
 
-bool process_sms(char *uri)
+bool process_sms(char *uri, int argc, char **argv)
 {
     char *char_ptr = NULL;
 
@@ -82,6 +81,9 @@ bool process_sms(char *uri)
     char message[BUFSIZE];
     char message_dec[BUFSIZE];
 
+    bool concat_message_ready;
+    bool concat_message_flag;
+
     static int concat_ref;
     static char concat_message[BUFSIZE];
 
@@ -98,6 +100,8 @@ bool process_sms(char *uri)
         from[index] = 0;
         printf("msisdn=%s\n", from);
     }
+    else
+        return false;
 
     // get to
     char_ptr =  strstr(uri, "&to=") + strlen("&to=");
@@ -108,6 +112,8 @@ bool process_sms(char *uri)
         dest[index] = 0;
         printf("to=%s\n", dest);
     }
+    else
+        return false;
 
     // get messageId
     char_ptr =  strstr(uri, "&messageId=") + strlen("&messageId=");
@@ -118,6 +124,8 @@ bool process_sms(char *uri)
         messageId[index] = 0;
         printf("messageId=%s\n", messageId);
     }
+    else
+        return false;
 
     // get type
     char_ptr =  strstr(uri, "&type=") + strlen("&type=");
@@ -128,6 +136,8 @@ bool process_sms(char *uri)
         type[index] = 0;
         printf("type=%s\n", type);
     }
+    else
+        return false;
 
     // get keyword
     char_ptr =  strstr(uri, "&keyword=") + strlen("&keyword=");
@@ -141,6 +151,8 @@ bool process_sms(char *uri)
         urldecode(keyword_dec, keyword);
         printf("keyword=%s\n", keyword_dec);
     }
+    else
+        return false;
 
     // get api-key
     char_ptr =  strstr(uri, "&api-key=") + strlen("&api-key=");
@@ -151,6 +163,8 @@ bool process_sms(char *uri)
         api_key[index] = 0;
         printf("api-key=%s\n", api_key);
     }
+    else
+        return false;
 
     // get message-timestamp
     char_ptr =  strstr(uri, "&message-timestamp=") + strlen("&message-timestamp=");
@@ -165,6 +179,8 @@ bool process_sms(char *uri)
         printf("message-timestamp=%s\n", timestamp_dec);
 
     }
+    else
+        return false;
 
     char_ptr =  strstr(uri, "&text=") + strlen("&text=");
     if (char_ptr)
@@ -179,11 +195,15 @@ bool process_sms(char *uri)
         urldecode(message_dec, message);
         printf("text=%s\n", message_dec);
     }
+    else
+        return false;
 
     // now we check if we are dealing with a concatenated messages...
     char_ptr =  strstr(uri, "&concat=true");
     if (char_ptr)
     {
+        concat_message_flag = true;
+
         // &concat-ref=222&concat-total=3&concat-part=3
         char_ptr =  strstr(uri, "&concat-ref=") + strlen("&concat-ref=");
         int concat_ref_now = atoi(char_ptr);
@@ -219,12 +239,24 @@ bool process_sms(char *uri)
 
         if (concat_total == concat_part)
         {
+            concat_message_ready = true;
             printf("concatenated-message=%s\n",concat_message);
         }
-
+        else
+        {
+            concat_message_ready = false;
+        }
+    }
+    else
+    {
+        concat_message_flag = false;
     }
 
-    // send mail
+
+    if (concat_message_flag && !concat_message_ready)
+        return true;
+
+    send_email(from, dest, timestamp, argc, argv, concat_message_flag? concat_message : message_dec);
 
     return true;
 }
