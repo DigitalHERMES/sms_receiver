@@ -47,7 +47,7 @@ bool send_email(char *from, char *dest, char *timestamp, int argc, char **argv, 
     strcat (mail_cmd, FROM);
     strcat (mail_cmd, " -s \"");
     strcat (mail_cmd, SUBJECT);
-    strcat (mail_cmd, "\" ");
+    strcat (mail_cmd, "\" -a \"Content-Type: text/plain; charset=UTF-8\" ");
 
 
     for (int i = 2; i < argc; i++)
@@ -60,11 +60,8 @@ bool send_email(char *from, char *dest, char *timestamp, int argc, char **argv, 
     printf("Running: %s\n", mail_cmd);
 
     email_body = popen(mail_cmd, "w");
-
     fprintf(email_body, "Mensagem enviada em %s, de %s:\n", timestamp, from);
-
     fprintf(email_body, "%s:\n", body);
-
     pclose(email_body);
 
     return true;
