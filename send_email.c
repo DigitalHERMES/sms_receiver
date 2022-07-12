@@ -30,46 +30,40 @@
 #include "process_sms.h"
 #include "send_email.h"
 
+// mail -s "teste" rafael2k@hermes.radio
+
+#define SUBJECT "Sistema de SMS HERMES"
+#define FROM "sms@hermes.radio"
 
 bool send_email(char *from, char *dest, char *timestamp, int argc, char **argv, char *body)
 {
-    char rmail_cmd[BUFSIZE];
-    char tmp_mail[BUFSIZE];
+    char mail_cmd[BUFSIZE];
     FILE *email_body;
-
-    sprintf(tmp_mail, "/tmp/smsreceiver.%d", getpid ());
 
     if (argc <= 2)
       return false;
 
-    // write the email...
-    email_body = fopen(tmp_mail, "w");
-    fprintf(email_body, "Subject: HERMES SMS Sytem\r\n");
-    fprintf(email_body, "From: rafael2k@hermes.radio\r\n");
-    fprintf(email_body, "To: rafael@riseup.net\r\n");
-    fprintf(email_body, "To: rafael@riseup.net\r\n");
-    fprintf(email_body, "\r\n");
-
-    fprintf(email_body, "SMS de %s, em %s\n", from, timestamp);
-    fprintf(email_body, "%s\n", body);
-
-    fclose(email_body);
-
-    sprintf(rmail_cmd, "(rmail ");
+    strcat (mail_cmd, "(mail -r ");
+    strcat (mail_cmd, FROM);
+    strcat (mail_cmd, "-s \"");
+    strcat (mail_cmd, SUBJECT);
+    strcat (mail_cmd, "\" ");
 
 
     for (int i = 2; i < argc; i++)
     {
-        strcat (rmail_cmd, argv[i]);
-        strcat (rmail_cmd, " ");
+        strcat (mail_cmd, argv[i]);
+        strcat (mail_cmd, " ");
     }
-    sprintf (rmail_cmd+strlen(rmail_cmd), "< %s)", tmp_mail);
+    mail_cmd[strlen(mail_cmd)] = ')';
 
-    printf("Running: %s\n", rmail_cmd);
+    printf("Running: %s\n", mail_cmd);
 
-    system(rmail_cmd);
+    email_body = popen(mail_cmd, "w");
 
-    unlink(tmp_mail);
+    fprintf(email_body, "Mensagem enviada em %s, de %s\n", timestamp, from);
+
+    pclose(email_body);
 
     return true;
 }
